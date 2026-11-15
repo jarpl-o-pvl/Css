@@ -6,320 +6,506 @@
     <title>Glitch Drop</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;900&display=swap');
 
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
         }
 
         body {
-            background: #07040a;
+            background-color: #0b0710;
             color: #ffffff;
-            font-family: 'Montserrat', sans-serif;
-            margin: 0;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             height: 100vh;
             overflow: hidden;
-            /* Фоновая сетка */
+            display: flex;
+            flex-direction: column;
             background-image: 
-                linear-gradient(rgba(138, 43, 226, 0.08) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(138, 43, 226, 0.08) 1px, transparent 1px);
-            background-size: 30px 30px;
+                radial-gradient(circle at 50% 0%, rgba(138, 43, 226, 0.15) 0%, transparent 70%);
         }
 
-        /* --- ЛОГОТИП --- */
-        .logo-container {
-            margin-bottom: 15px;
-            text-align: center;
+        /* --- ВЕРХНЯЯ ПАНЕЛЬ --- */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            background: #150d20;
+            border-bottom: 1px solid #2a1b3d;
+        }
+        .balance-pill {
+            background: #000;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
         }
 
-        .logo {
-            font-size: 34px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            background: linear-gradient(90deg, #b366ff, #ff00ff, #00ffff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            position: relative;
-            animation: glitch-anim 3s infinite;
+        /* --- ЭКРАНЫ --- */
+        .screen {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 15px;
+            padding-bottom: 100px; /* Место под меню */
+        }
+        .screen.active {
+            display: block;
         }
 
-        .subtitle {
-            font-size: 10px;
-            color: #8a2be2;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            font-weight: 800;
-            margin-top: 5px;
+        /* --- ГЛАВНЫЙ ЭКРАН (КЕЙСЫ) --- */
+        .case-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
-        @keyframes glitch-anim {
-            0% { transform: translate(0); }
-            2% { transform: translate(-2px, 2px); }
-            4% { transform: translate(-2px, -2px); }
-            6% { transform: translate(2px, 2px); }
-            8% { transform: translate(2px, -2px); }
-            10% { transform: translate(0); }
-            100% { transform: translate(0); }
-        }
-
-        /* --- ХЕДЕР И БАЛАНС --- */
-        .header {
-            width: 100%;
-            max-width: 400px;
+        .case-card {
+            background: linear-gradient(145deg, #1c1126, #110815);
+            border: 1px solid #3a2555;
+            border-radius: 20px;
+            padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 20px;
-            background: rgba(20, 10, 35, 0.8);
-            border-radius: 15px;
-            border: 1px solid rgba(138, 43, 226, 0.5);
-            margin-bottom: 25px;
-            box-shadow: 0 0 15px rgba(138, 43, 226, 0.3);
-        }
-
-        .user-info {
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .user-info span {
-            color: #00ffff;
-            text-shadow: 0 0 5px #00ffff;
-        }
-
-        .balance {
-            font-size: 16px;
-            color: #00ffff;
-            font-weight: 900;
-            background: rgba(0, 255, 255, 0.1);
-            padding: 5px 12px;
-            border-radius: 10px;
-            border: 1px solid rgba(0, 255, 255, 0.3);
-        }
-
-        /* --- КЕЙС --- */
-        .case-container {
-            width: 100%;
-            max-width: 320px;
-            height: 320px;
-            border-radius: 30px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: radial-gradient(circle at center, rgba(138, 43, 226, 0.2) 0%, rgba(7, 4, 10, 0.95) 100%);
-            border: 2px solid rgba(255, 0, 255, 0.5);
-            box-shadow: 
-                0 0 40px rgba(255, 0, 255, 0.2), 
-                inset 0 0 30px rgba(255, 0, 255, 0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
             position: relative;
             overflow: hidden;
-            margin-bottom: 30px;
         }
 
-        /* Бегущая неоновая линия */
-        .case-container::before {
+        .case-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, #ff00ff, #00ffff, transparent);
-            animation: scanline 2s linear infinite;
+            top: 0; left: 0; width: 5px; height: 100%;
+            background: #ff00ff;
+            box-shadow: 0 0 10px #ff00ff;
         }
 
-        @keyframes scanline {
-            0% { top: 0; opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { top: 100%; opacity: 0; }
-        }
-
-        .prize {
-            font-size: 100px;
-            transition: transform 0.05s;
-            filter: drop-shadow(0 0 25px rgba(255, 0, 255, 0.8));
-            z-index: 2;
-        }
-
-        /* --- КНОПКА --- */
-        .open-btn {
-            background: linear-gradient(45deg, #8a2be2, #4b0082);
-            border: 2px solid #b366ff;
-            border-radius: 20px;
-            padding: 20px 40px;
-            color: #ffffff;
-            font-family: 'Montserrat', sans-serif;
+        .case-info h3 {
             font-size: 18px;
             font-weight: 900;
-            cursor: pointer;
-            box-shadow: 0 0 20px rgba(138, 43, 226, 0.8);
-            transition: all 0.2s;
+            margin-bottom: 5px;
+        }
+        .case-price {
+            color: #00ffff;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .case-image {
+            font-size: 50px;
+            filter: drop-shadow(0 0 10px rgba(255, 0, 255, 0.5));
+        }
+
+        /* --- ЭКРАН РУЛЕТКИ --- */
+        .roulette-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        
+        .case-opening-box {
+            width: 100%;
+            max-width: 300px;
+            height: 200px;
+            background: #000;
+            border: 2px solid #8a2be2;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 30px rgba(138, 43, 226, 0.5), 0 0 20px rgba(138, 43, 226, 0.3);
+        }
+
+        /* Бегущая строка */
+        .roulette-strip {
+            display: flex;
+            position: absolute;
+            left: 0;
+            transition: transform 3s cubic-bezier(0.1, 0.8, 0.1, 1);
+        }
+        
+        .roulette-item {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            flex-shrink: 0;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .center-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 2px;
+            background: #ff00ff;
+            box-shadow: 0 0 15px #ff00ff;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        /* --- ЭКРАН ВЫИГРЫША --- */
+        .win-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .win-prize-display {
+            font-size: 100px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 30px rgba(255, 0, 255, 0.8));
+            animation: float 2s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .win-title {
+            font-size: 24px;
+            font-weight: 900;
+            color: #00ffff;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px #00ffff;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
             width: 100%;
             max-width: 320px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
-        .open-btn:active {
-            transform: scale(0.95);
-            box-shadow: 0 0 10px rgba(138, 43, 226, 1);
-        }
-
-        .open-btn:disabled {
-            border-color: #333;
-            color: #666;
-            background: #1a1a1a;
-            box-shadow: none;
-        }
-
-        /* --- ТОСТ (Уведомление) --- */
-        .toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-100px);
-            background: rgba(255, 0, 255, 0.9);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-weight: 800;
+        .action-btn {
+            flex: 1;
+            padding: 15px;
+            border-radius: 15px;
             font-size: 14px;
-            box-shadow: 0 0 20px rgba(255, 0, 255, 0.6);
-            transition: transform 0.3s ease-in-out;
-            z-index: 100;
+            font-weight: 900;
+            text-transform: uppercase;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
         }
 
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
+        .btn-sell {
+            background: linear-gradient(45deg, #ff0055, #990033);
+            box-shadow: 0 5px 15px rgba(255, 0, 85, 0.4);
         }
+        
+        .btn-upgrade {
+            background: linear-gradient(45deg, #00ccff, #0066ff);
+            box-shadow: 0 5px 15px rgba(0, 204, 255, 0.4);
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* --- НИЖНЕЕ МЕНЮ --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #120a1c;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 10px;
+            border-top: 1px solid #2a1b3d;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.8);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #666;
+            font-size: 10px;
+            font-weight: 700;
+            gap: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .nav-item.active {
+            color: #b366ff;
+            text-shadow: 0 0 10px rgba(179, 102, 255, 0.5);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        /* Утилиты */
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div class="logo-container">
-        <div class="logo">Glitch Drop</div>
-        <div class="subtitle">Лови свой редкий дроп</div>
+    <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
+    <div class="top-bar">
+        <div class="balance-pill">👤 <span id="user-name">Игрок</span></div>
+        <div class="balance-pill">💎 <span id="balance">0</span></div>
     </div>
 
-    <div class="header">
-        <div class="user-info">👤 <span id="username">Игрок</span></div>
-        <div class="balance" id="balance">💎 0</div>
+    <!-- ЭКРАН 1: ГЛАВНАЯ (КЕЙСЫ) -->
+    <div class="screen active" id="screen-main">
+        <h2 style="margin-bottom: 20px; font-size: 20px;">Выбери кейс</h2>
+        <div class="case-list">
+            <div class="case-card" onclick="startOpening('common')">
+                <div class="case-info">
+                    <h3>Обычный кейс</h3>
+                    <div class="case-price">10 💎</div>
+                </div>
+                <div class="case-image">🎁</div>
+            </div>
+            <div class="case-card" onclick="startOpening('rare')" style="border-color: #00ffff;">
+                <div class="case-info">
+                    <h3 style="color: #00ffff;">Редкий кейс</h3>
+                    <div class="case-price">50 💎</div>
+                </div>
+                <div class="case-image">📦</div>
+            </div>
+            <div class="case-card" onclick="startOpening('legend')" style="border-color: #ff00ff;">
+                <div class="case-info">
+                    <h3 style="color: #ff00ff;">Легендарный кейс</h3>
+                    <div class="case-price">150 💎</div>
+                </div>
+                <div class="case-image">💎</div>
+            </div>
+        </div>
     </div>
 
-    <div class="case-container" id="case-box">
-        <div class="prize" id="prize">🎁</div>
+    <!-- ЭКРАН 2: РУЛЕТКА -->
+    <div class="screen" id="screen-roulette">
+        <div class="roulette-container">
+            <h2 id="roulette-title" style="margin-bottom: 30px;">Крутим кейс...</h2>
+            <div class="case-opening-box">
+                <div class="center-line"></div>
+                <div class="roulette-strip" id="roulette-strip">
+                    <!-- Сюда JS сгенерирует картинки -->
+                </div>
+            </div>
+        </div>
     </div>
 
-    <button class="open-btn" id="open-button" onclick="openCase()">Открыть кейс (10 💎)</button>
+    <!-- ЭКРАН 3: ВЫИГРЫШ -->
+    <div class="screen" id="screen-win">
+        <div class="win-screen">
+            <div class="win-prize-display" id="win-emoji">🌹</div>
+            <div class="win-title" id="win-name">Роза</div>
+            
+            <div class="action-buttons">
+                <button class="action-btn btn-sell" onclick="sellPrize()">
+                    <span style="font-size: 20px;">💰</span>
+                    Продать (<span id="sell-price">0</span> 💎)
+                </button>
+                <button class="action-btn btn-upgrade" onclick="upgradePrize()">
+                    <span style="font-size: 20px;">🔄</span>
+                    Улучшить
+                </button>
+            </div>
+        </div>
+    </div>
 
-    <div class="toast" id="toast">Недостаточно кристаллов!</div>
+    <!-- НИЖНЕЕ МЕНЮ -->
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchScreen('main')" id="nav-main">
+            <div class="nav-icon">📦</div>
+            Главная
+        </div>
+        <div class="nav-item" onclick="switchScreen('profile')" id="nav-profile">
+            <div class="nav-icon">👤</div>
+            Профиль
+        </div>
+    </div>
 
     <script>
-        // Инициализация Telegram WebApp
+        // --- ИНИЦИАЛИЗАЦИЯ ---
         Telegram.WebApp.ready();
-        Telegram.WebApp.expand(); 
+        Telegram.WebApp.expand();
         
-        // Получаем данные пользователя
+        let balance = 500; // Для теста даем много
+        let currentPrize = null;
+        let currentPrice = 0;
+        let isAnimating = false;
+
         const user = Telegram.WebApp.initDataUnsafe?.user;
-        if (user) {
-            document.getElementById('username').innerText = user.first_name;
-        }
+        if (user) document.getElementById('user-name').innerText = user.first_name;
 
-        // Игровая логика
-        let balance = 50; 
-        const balanceElement = document.getElementById('balance');
-        const prizeElement = document.getElementById('prize');
-        const button = document.getElementById('open-button');
-        const toast = document.getElementById('toast');
+        // --- ДАННЫЕ ПРИЗОВ ---
+        const PRIZES = [
+            { emoji: '🎁', name: 'Подарок', sellPrice: 5, chance: 40 },
+            { emoji: '🌹', name: 'Роза', sellPrice: 10, chance: 30 },
+            { emoji: '🧸', name: 'Мишка', sellPrice: 25, chance: 15 },
+            { emoji: '🚀', name: 'Ракета', sellPrice: 60, chance: 8 },
+            { emoji: '👾', name: 'Глитч', sellPrice: 150, chance: 5 },
+            { emoji: '👑', name: 'Корона', sellPrice: 500, chance: 2 }
+        ];
 
-        // Призы
-        const prizes = ['🎁', '🌹', '🧸', '🚀', '💎', '🐶', '🔥', '👾', '👑', '💣'];
-
+        // --- ФУНКЦИИ ---
         function updateBalance() {
-            balanceElement.innerText = `💎 ${balance}`;
+            document.getElementById('balance').innerText = balance;
         }
 
-        function showToast(message) {
-            toast.innerText = message;
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 2500);
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            if (screenId === 'main') {
+                document.getElementById('screen-main').classList.add('active');
+                document.getElementById('nav-main').classList.add('active');
+            } else if (screenId === 'profile') {
+                // Заглушка для профиля
+                Telegram.WebApp.showAlert("Профиль в разработке!");
+                document.getElementById('screen-main').classList.add('active');
+                document.getElementById('nav-main').classList.add('active');
+            }
         }
 
-        function openCase() {
-            if (balance < 10) {
-                showToast("❌ Недостаточно кристаллов!");
-                // Вибрация при ошибке
+        // --- ЛОГИКА КЕЙСОВ ---
+        function startOpening(caseType) {
+            if (isAnimating) return;
+
+            let cost = 10;
+            if (caseType === 'rare') cost = 50;
+            if (caseType === 'legend') cost = 150;
+
+            if (balance < cost) {
+                Telegram.WebApp.showAlert("Недостаточно кристаллов!");
                 Telegram.WebApp.HapticFeedback.notificationOccurred('error');
                 return;
             }
 
-            // Списываем средства
-            balance -= 10;
+            // Списываем
+            balance -= cost;
             updateBalance();
+            isAnimating = true;
+
+            // Переключаем экран
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen-roulette').classList.add('active');
             
-            // Блокируем кнопку
-            button.disabled = true;
-            button.innerText = "КРУТИМ...";
+            // Генерируем ленту (30 элементов)
+            const strip = document.getElementById('roulette-strip');
+            strip.innerHTML = '';
+            strip.style.transition = 'none';
+            strip.style.transform = 'translateX(0)';
 
-            // Вибрация при начале
-            Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+            let winIndex = Math.floor(Math.random() * 26) + 2; // Выигрышный элемент (не первый и не последний)
+            let winItem = null;
 
-            let spins = 0;
-            
-            // Запускаем анимацию кручения
-            const spinInterval = setInterval(() => {
-                // Меняем эмодзи
-                prizeElement.innerText = prizes[Math.floor(Math.random() * prizes.length)];
-                
-                // Эффект глитча (сдвигаем по X и Y)
-                prizeElement.style.transform = `translate(${Math.random() * 30 - 15}px, ${Math.random() * 30 - 15}px) scale(${1 + Math.random() * 0.2})`;
-                
-                spins++;
-            }, 50);
-
-            // Останавливаем через 2.5 секунды
-            setTimeout(() => {
-                clearInterval(spinInterval);
-                
-                // Резкий возврат в центр
-                prizeElement.style.transform = 'translate(0, 0) scale(1)';
-
-                // Выбираем финальный приз
-                const winIndex = Math.floor(Math.random() * prizes.length);
-                const winPrize = prizes[winIndex];
-                prizeElement.innerText = winPrize;
-
-                // Возвращаем кнопку
-                button.disabled = false;
-                button.innerText = "ОТКРЫТЬ КЕЙС (10 💎)";
-                
-                // Логика призов
-                if (winPrize === '💎') {
-                    balance += 20;
-                    updateBalance();
-                    showToast("🎉 Ты выиграл 20 Кристаллов!");
-                    Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-                } else if (winPrize === '👑' || winPrize === '👾') {
-                    showToast(`🔥 РЕДКИЙ ДРОП: ${winPrize}!`);
-                    Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-                } else {
-                    showToast(`Ты выбил: ${winPrize}`);
+            for (let i = 0; i < 30; i++) {
+                let randomPrize = PRIZES[Math.floor(Math.random() * PRIZES.length)];
+                if (i === winIndex) {
+                    // Определяем реальный выигрыш
+                    winItem = getRandomPrizeByChance();
+                    currentPrize = winItem;
+                    currentPrice = winItem.sellPrice;
                 }
+                
+                let itemToDraw = (i === winIndex) ? winItem : randomPrize;
 
-            }, 2500);
+                const div = document.createElement('div');
+                div.className = 'roulette-item';
+                div.innerText = itemToDraw.emoji;
+                strip.appendChild(div);
+            }
+
+            // Запускаем анимацию через микро-задержку (чтобы браузер прогрузил DOM)
+            setTimeout(() => {
+                // Вычисляем позицию: каждый элемент 100px + 1px border = 101px
+                // Нам нужно, чтобы центр (150px) совпал с центром выигрышного элемента.
+                // (winIndex * 101) - 150 (половина экрана) + 50 (половина элемента)
+                const offset = (winIndex * 101) - 100; 
+                
+                strip.style.transition = 'transform 3.5s cubic-bezier(0.1, 0.8, 0.1, 1)';
+                strip.style.transform = `translateX(-${offset}px)`;
+                Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
+
+                // Ждем окончания анимации
+                setTimeout(() => {
+                    isAnimating = false;
+                    showWinScreen();
+                }, 3600);
+            }, 50);
         }
 
-        // Первичная отрисовка
+        function getRandomPrizeByChance() {
+            const totalChance = PRIZES.reduce((sum, p) => sum + p.chance, 0);
+            let random = Math.random() * totalChance;
+            for (let p of PRIZES) {
+                if (random < p.chance) return p;
+                random -= p.chance;
+            }
+            return PRIZES[0];
+        }
+
+        function showWinScreen() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen-win').classList.add('active');
+            
+            document.getElementById('win-emoji').innerText = currentPrize.emoji;
+            document.getElementById('win-name').innerText = currentPrize.name;
+            document.getElementById('sell-price').innerText = currentPrize.sellPrice;
+            
+            Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+        }
+
+        // --- ДЕЙСТВИЯ С ПРИЗОМ ---
+        function sellPrize() {
+            balance += currentPrize.sellPrice;
+            updateBalance();
+            Telegram.WebApp.showAlert(`Ты продал ${currentPrize.name} за ${currentPrize.sellPrice} 💎`);
+            switchScreen('main');
+            Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+        }
+
+        function upgradePrize() {
+            // Шанс апгрейда 30%
+            if (Math.random() < 0.3) {
+                // Успех
+                let newPrize = PRIZES[Math.floor(Math.random() * PRIZES.length)];
+                currentPrize = newPrize;
+                currentPrice = newPrize.sellPrice;
+                
+                document.getElementById('win-emoji').innerText = currentPrize.emoji;
+                document.getElementById('win-name').innerText = currentPrize.name + " (УЛУЧШЕН!)";
+                document.getElementById('sell-price').innerText = currentPrize.sellPrice;
+                Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+            } else {
+                // Провал
+                Telegram.WebApp.showAlert("❌ Улучшение не удалось! Приз сгорел.");
+                switchScreen('main');
+                Telegram.WebApp.HapticFeedback.notificationOccurred('error');
+            }
+        }
+
+        // Запуск
         updateBalance();
     </script>
 </body>
